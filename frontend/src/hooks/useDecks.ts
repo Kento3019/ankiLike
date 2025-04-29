@@ -5,13 +5,18 @@ export const useDecks = () => {
     const [decks, setDecks] = useState<Deck[]>([]);
     const [deckName, setDeckName] = useState("");
 
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
     const fetchDecks = async () => {
         // ここでAPIからデッキの情報を取得する処理を実装する
-        return [
-            { deckId: "1", name: "Deck 1", cardCount: 10, newCount: 5, learningCount: 3, toReviewCount: 2 },
-            { deckId: "2", name: "Deck 2", cardCount: 20, newCount: 10, learningCount: 5, toReviewCount: 5 },
-            { deckId: "3", name: "Deck 3", cardCount: 15, newCount: 7, learningCount: 4, toReviewCount: 4 },
-        ];
+
+        console.log(apiBaseUrl);
+        const data =
+            fetch(`${apiBaseUrl}/api/deck/list`, { method: "GET", headers: { "Content-Type": "application/json" } })
+                .then((response) => response.json())
+                .catch((error) => console.error("Error fetching decks:", error));
+
+        return data;
     };
 
     const loadDecks = async () => {
@@ -20,10 +25,29 @@ export const useDecks = () => {
     };
 
     const createDeck = async () => {
-        alert(`Deck "${deckName}" created!`);
-        setDeckName("");
-        loadDecks(); // 仮想：作ったらリスト更新
+        if (!deckName) {
+            alert("デッキ名を入力してください。");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/deck/create`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ deckId: "", name: deckName, cardCount: 0, newCount: 0, learningCount: 0, reviewCount: 0 }),
+            });
+
+            if (response.ok) {
+                alert("デッキが作成されました。");
+                await loadDecks(); // 通信成功後に呼び出す
+            } else {
+                alert("デッキの作成に失敗しました。");
+            }
+        } catch (error) {
+            console.error("Error creating deck:", error);
+        }
     };
+
 
     useEffect(() => {
         loadDecks();

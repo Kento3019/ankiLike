@@ -1,10 +1,10 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Decks } from '../../pages/decks';
-import Header from './header';
 import Add from '../../pages/Add';
 import { Study } from '../../pages/Study';
 import Search from '../../pages/Search';
+import Header from './Header';
+import { Decks } from '../../pages/Decks';
 
 export const Router = () => {
     return (

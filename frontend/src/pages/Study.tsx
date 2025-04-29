@@ -1,8 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useStudySession } from "../hooks/useStudySession"; // フックを読み込み
 
 export const Study = () => {
-    const { studySession, assessments, twoSideCard, setTwoSideCard, requestQuizResult } = useStudySession();
+    const deckId = useLocation().pathname.split("/").pop() || "";
+    const { studySession, assessments, twoSideCard, setTwoSideCard, requestQuizResult } = useStudySession(deckId);
     const navigator = useNavigate();
 
     const navigateToDecks = () => {
@@ -12,7 +13,7 @@ export const Study = () => {
     return (
         <div className="study-container">
             <h1>Study Session</h1>
-            {studySession ? (
+            {studySession && studySession.cards.length > 0 ? (
                 <div className="card-display">
                     <h2>{studySession.cards[studySession.currentIndex].front}</h2>
                     {!twoSideCard ? (
@@ -23,7 +24,7 @@ export const Study = () => {
                             {assessments.map((assessment, index) => (
                                 <button
                                     key={index}
-                                    onClick={() => requestQuizResult(assessment)}
+                                    onClick={() => requestQuizResult(studySession.cards[studySession.currentIndex], assessment)}
                                 >
                                     {assessment}
                                 </button>

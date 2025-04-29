@@ -22,10 +22,6 @@ const Add = () => {
                     <label htmlFor="back">Back:</label>
                     <textarea id="back" name="back" value={formData.back} onChange={handleChange} required />
                 </div>
-                <div>
-                    <label htmlFor="tag">Tag:</label>
-                    <input type="text" id="tag" name="tag" value={formData.tag} onChange={handleChange} />
-                </div>
                 <button type="submit">Add Card</button>
             </form>
         </div>

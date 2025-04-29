@@ -4,8 +4,5 @@ export interface Card {
     typeCd: string;
     front: string;
     back: string;
-    tag: string;
     statusCd: string;
-    lastStudiedDatetime: string;
-    nextSpan: number;
 }

@@ -4,5 +4,5 @@ export interface Deck {
     cardCount: number;
     newCount: number;
     learningCount: number;
-    toReviewCount: number;
+    reviewCount: number;
 }

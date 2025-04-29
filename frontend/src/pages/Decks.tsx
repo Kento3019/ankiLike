@@ -54,7 +54,7 @@ export const Decks = () => {
                             <td>{deck.cardCount}</td>
                             <td>{deck.newCount}</td>
                             <td>{deck.learningCount}</td>
-                            <td>{deck.toReviewCount}</td>
+                            <td>{deck.reviewCount}</td>
                             <td>
                                 <button
                                     style={{ color: 'black' }}
