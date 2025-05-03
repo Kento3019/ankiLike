@@ -1,15 +1,15 @@
-package com.example.ankilike.domain;
+package com.example.ankilike.domain.card;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.example.ankilike.domain.SuperMemo2.Assessment;
+import com.example.ankilike.domain.algorithm.SuperMemo2;
+import com.example.ankilike.domain.algorithm.SuperMemo2.Assessment;
+import com.example.ankilike.domain.algorithm.SuperMemo2.ReviewResult;
 import com.example.ankilike.dto.CardDTO;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 
 @Entity
 public class Card {
@@ -36,7 +36,7 @@ public class Card {
 
     // Constructor
     public Card(String deckId, String typeCd, String front, String back, String statusCd) {
-        this.cardId = generateCardId(); // Generate a unique card ID;
+        this.cardId = CARD_ID_PREFIX + UUID.randomUUID().toString();
         this.deckId = deckId;
         this.typeCd = typeCd;
         this.front = front;
@@ -50,18 +50,11 @@ public class Card {
         this.easeFactor = 2.5; // 初期値
     }
 
-    private String generateCardId() {
-        // Generate a unique card ID (e.g., using UUID or a custom logic)
-        UUID uuid = UUID.randomUUID();
-        String cardId = CARD_ID_PREFIX + uuid.toString();
-        return cardId;
-    }
-
     public void review(String asessmentString) {
         Assessment assessment = Assessment.from(asessmentString);
         SuperMemo2 sm2 = new SuperMemo2();
 
-        SuperMemo2.ReviewResult result = sm2.calculateNext(
+        ReviewResult result = sm2.calculateNext(
                 this.studyInterval,
                 this.repetition,
                 this.easeFactor,
@@ -76,7 +69,24 @@ public class Card {
         this.nextStudyDate = this.lastStudiedDate.plusMinutes(this.studyInterval);
     }
 
+    public void updateFromDTO(CardDTO dto) {
+        if (dto.getDeckId() != null)
+            this.deckId = dto.getDeckId();
+        if (dto.getTypeCd() != null)
+            this.typeCd = dto.getTypeCd();
+        if (dto.getFront() != null)
+            this.front = dto.getFront();
+        if (dto.getBack() != null)
+            this.back = dto.getBack();
+        if (dto.getStatusCd() != null)
+            this.statusCd = dto.getStatusCd();
+    }
+
     public CardDTO toDTO() {
         return new CardDTO(cardId, deckId, typeCd, front, back, statusCd);
+    }
+
+    public String getStatusCd() {
+        return statusCd;
     }
 }

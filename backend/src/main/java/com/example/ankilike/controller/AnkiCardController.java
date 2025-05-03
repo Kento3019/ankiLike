@@ -17,6 +17,7 @@ import com.example.ankilike.dto.CardAssessmentDTO;
 import com.example.ankilike.dto.CardDTO;
 import com.example.ankilike.service.CardService;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/card")
 public class AnkiCardController {
@@ -25,45 +26,33 @@ public class AnkiCardController {
     private CardService cardService;
 
     @GetMapping("/list")
-    @CrossOrigin(origins = "*")
     public List<CardDTO> listCards(@RequestParam String deckId) {
-        List<CardDTO> cards = cardService.listCards(deckId);
-
-        return cards;
+        return cardService.listCards(deckId);
     }
 
-    @GetMapping("/Quizlist")
-    @CrossOrigin(origins = "*")
+    @GetMapping("/quiz-list")
     public List<CardDTO> listQuizCards(@RequestParam String deckId) {
-        List<CardDTO> quizCards = cardService.listQuizCards(deckId);
-
-        return quizCards;
+        return cardService.listQuizCards(deckId);
     }
 
-    @PostMapping("/QuizResult")
-    @CrossOrigin(origins = "*")
+    @PostMapping("/quiz-result")
     public void quizResult(@RequestBody CardAssessmentDTO cardAssessmentDTO) {
-
-        System.out.println("Card ID: " + cardAssessmentDTO.getCardId());
-        System.out.println("Result: " + cardAssessmentDTO.getResult());
-
         cardService.quizResult(cardAssessmentDTO);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")
-    @CrossOrigin(origins = "*")
     public void createCard(@RequestBody CardDTO card) {
-        // Logic to create a new card
         cardService.createCard(card);
     }
 
     @PostMapping("/delete")
-    public void deleteCard() {
+    public void deleteCard(@RequestBody CardDTO card) {
+        // cardService.deleteCard(card.getCardId());
     }
 
-    @GetMapping("/update")
-    public void updateCard() {
+    @PostMapping("/update")
+    public void updateCard(@RequestBody CardDTO card) {
+        cardService.updateCard(card);
     }
-
 }

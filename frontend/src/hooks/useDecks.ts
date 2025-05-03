@@ -1,57 +1,86 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
 import { Deck } from "../types/Deck";
+
+const INITIAL_DECK: Deck = {
+    deckId: "",
+    name: "",
+    cardCount: 0,
+    newCount: 0,
+    learningCount: 0,
+    reviewCount: 0,
+};
+
+const API_ENDPOINTS = {
+    LIST: "/api/deck/list",
+    CREATE: "/api/deck/create",
+    UPDATE: "/api/deck/update",
+    DELETE: "/api/deck/delete",
+};
 
 export const useDecks = () => {
     const [decks, setDecks] = useState<Deck[]>([]);
-    const [deckName, setDeckName] = useState("");
+    const [selectedDeck, setSelectedDeck] = useState<Deck>(INITIAL_DECK);
 
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-    const fetchDecks = async () => {
-        // ここでAPIからデッキの情報を取得する処理を実装する
+    const loadDecks = useCallback(async () => {
+        try {
+            const response = await fetch(`${apiBaseUrl}${API_ENDPOINTS.LIST}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            });
 
-        console.log(apiBaseUrl);
-        const data =
-            fetch(`${apiBaseUrl}/api/deck/list`, { method: "GET", headers: { "Content-Type": "application/json" } })
-                .then((response) => response.json())
-                .catch((error) => console.error("Error fetching decks:", error));
+            if (!response.ok) throw new Error("Failed to load decks");
 
-        return data;
-    };
+            const data = await response.json();
+            setDecks(data);
+        } catch (error) {
+            console.error("Error loading decks:", error);
+            toast.error("An error occurred while loading the decks");
+        }
+    }, [apiBaseUrl]);
 
-    const loadDecks = async () => {
-        const data = await fetchDecks();
-        setDecks(data);
-    };
-
-    const createDeck = async () => {
-        if (!deckName) {
-            alert("デッキ名を入力してください。");
+    const postDeck = async (endpoint: string, successMessage: string) => {
+        if (!selectedDeck.name.trim()) {
+            toast.warn("Please enter a deck name.");
             return;
         }
 
         try {
-            const response = await fetch(`${apiBaseUrl}/api/deck/create`, {
+            const response = await fetch(`${apiBaseUrl}${endpoint}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ deckId: "", name: deckName, cardCount: 0, newCount: 0, learningCount: 0, reviewCount: 0 }),
+                body: JSON.stringify(selectedDeck),
             });
 
             if (response.ok) {
-                alert("デッキが作成されました。");
-                await loadDecks(); // 通信成功後に呼び出す
+                toast.success(successMessage);
+                await loadDecks();
+                setSelectedDeck(INITIAL_DECK);
             } else {
-                alert("デッキの作成に失敗しました。");
+                toast.error(`Failed to ${successMessage.toLowerCase()}`);
             }
         } catch (error) {
-            console.error("Error creating deck:", error);
+            console.error("Error during deck operation:", error);
+            toast.error("Network error has occurred");
         }
     };
 
+    const createDeck = () => postDeck(API_ENDPOINTS.CREATE, "Deck Created");
+    const updateDeck = () => postDeck(API_ENDPOINTS.UPDATE, "Deck Updated");
+    const deleteDeck = () => postDeck(API_ENDPOINTS.DELETE, "Deck Deleted");
 
     useEffect(() => {
         loadDecks();
-    }, []);
+    }, [loadDecks]);
 
-    return { decks, deckName, setDeckName, createDeck };
+    return {
+        decks,
+        selectedDeck,
+        setSelectedDeck,
+        createDeck,
+        updateDeck,
+        deleteDeck,
+    };
 };

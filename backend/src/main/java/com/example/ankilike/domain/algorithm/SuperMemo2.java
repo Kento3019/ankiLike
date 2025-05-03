@@ -1,4 +1,4 @@
-package com.example.ankilike.domain;
+package com.example.ankilike.domain.algorithm;
 
 public class SuperMemo2 {
 

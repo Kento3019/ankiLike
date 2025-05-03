@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import { StudySession } from "../types/StudySession";
 import { Card } from "../types/Card";
+import { useDeck } from "../context/DeckProvider";
+import { useCard } from "../context/CardProvider";
 
-export const useStudySession = (deckId: string) => {
+export const useStudySession = () => {
+    const { deck } = useDeck();
+    const { card, setCard } = useCard();
     const [studySession, setStudySession] = useState<StudySession | null>(null);
     const [assessments, setAssessments] = useState<string[]>([]);
     const [twoSideCard, setTwoSideCard] = useState(false);
@@ -10,23 +14,30 @@ export const useStudySession = (deckId: string) => {
 
     useEffect(() => {
         const startStudySession = async () => {
+            const deckId = deck?.deckId || "";
+            if (!deckId) return; // デッキIDがない場合は何もしない
+
             const queryparam = new URLSearchParams({ deckId });
             try {
-                const response = await fetch(`${apiBaseUrl}/api/card/Quizlist?` + queryparam, {
+                const response = await fetch(`${apiBaseUrl}/api/card/quiz-list?` + queryparam, {
                     method: "GET",
                     headers: { "Content-Type": "application/json" }
                 });
                 const cards = await response.json();
+
+                const currentIndex = cards.findIndex((c: Card) => c.cardId === card?.cardId);
+
+
                 const sessionData: StudySession = {
                     deckId,
                     cards,
-                    currentIndex: 0,
+                    currentIndex: currentIndex >= 0 ? currentIndex : 0,
                     totalCards: 0,
                     limit: 10,
                 };
                 setStudySession(sessionData);
+                setCard(undefined);
 
-                console.log("Study session started:", sessionData);
             } catch (error) {
                 console.error("Error fetching cards:", error);
             }
@@ -43,7 +54,7 @@ export const useStudySession = (deckId: string) => {
 
     const requestQuizResult = async (card: Card, result: string) => {
         console.log(card.cardId, result);
-        const response = await fetch(`${apiBaseUrl}/api/card/QuizResult`,
+        const response = await fetch(`${apiBaseUrl}/api/card/quiz-result`,
             {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ cardId: card.cardId, result })

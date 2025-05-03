@@ -1,6 +1,6 @@
 package com.example.ankilike.dto;
 
-import com.example.ankilike.domain.Deck;
+import com.example.ankilike.domain.deck.Deck;
 
 public class DeckDTO {
     private String deckId;

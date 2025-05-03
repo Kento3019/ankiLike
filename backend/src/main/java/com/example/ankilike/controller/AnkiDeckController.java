@@ -1,8 +1,6 @@
 package com.example.ankilike.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,8 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.ankilike.dto.DeckDTO;
 import com.example.ankilike.service.DeckService;
 
-//https://daiichi.dev/%EF%BC%92%EF%BC%97%EF%BC%8Espring-boot%E3%81%AB%E3%82%88%E3%82%8Brestful-api%E3%81%AE%E9%96%8B%E7%99%BA%E3%82%AC%E3%82%A4%E3%83%89/
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/deck")
 public class AnkiDeckController {
@@ -25,27 +22,25 @@ public class AnkiDeckController {
     private DeckService deckService;
 
     @GetMapping("/list")
-    @CrossOrigin(origins = "*")
     public List<DeckDTO> listDecks() {
-        // Sample data for demonstration purposes
-        List<DeckDTO> decks = deckService.listDecks();
-        return decks;
+        return deckService.listDecks();
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")
-    @CrossOrigin(origins = "*")
     public void createDeck(@RequestBody DeckDTO deck) {
         deckService.createDeck(deck.getName());
-
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/delete")
-    public void deleteDeck() {
+    public void deleteDeck(@RequestBody DeckDTO deck) {
+        deckService.deleteDeck(deck.getDeckId());
     }
 
-    @GetMapping("/update")
-    public void updateDeck() {
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/update")
+    public void updateDeck(@RequestBody DeckDTO deck) {
+        deckService.updateDeck(deck);
     }
-
 }

@@ -6,10 +6,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.ankilike.domain.Card;
+import com.example.ankilike.domain.card.Card;
 import com.example.ankilike.dto.CardAssessmentDTO;
 import com.example.ankilike.dto.CardDTO;
 import com.example.ankilike.repository.CardRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class CardService {
@@ -28,15 +30,16 @@ public class CardService {
         // Logic to delete a card
     }
 
-    public void updateCard() {
-        // Logic to update a card
+    public void updateCard(CardDTO cardDTO) {
+        Card existingCard = cardRepository.findById(cardDTO.getCardId())
+                .orElseThrow(() -> new EntityNotFoundException("Card not found"));
+
+        existingCard.updateFromDTO(cardDTO); // domainメソッドで更新
+        cardRepository.save(existingCard);
     }
 
     public List<CardDTO> listCards(String deckId) {
-        System.out.println("deckId: " + deckId);
-
         List<Card> cards = cardRepository.findByDeckId(deckId);
-        System.out.println("cards.size(): " + cards.size());
         return cards.stream().map(e -> e.toDTO()).toList();
     }
 
