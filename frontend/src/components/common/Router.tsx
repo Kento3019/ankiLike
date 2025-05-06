@@ -1,45 +1,27 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Update from '../../pages/Update';
 import { Study } from '../../pages/Study';
+import { CardForm } from '../../pages/CardForm';
 import Search from '../../pages/Search';
 import { Decks } from '../../pages/Decks';
 import PageTemplate from './PageTemplate';
-import { DeckProvider } from '../../context/DeckProvider';
-import { CardProvider } from '../../context/CardProvider';
+import { CardProvider } from '../../context/Card/CardProvider';
+import { DeckProvider } from '../../context/Deck/DeckProvider';
+import { AppSettingsProvider } from '../../context/AppSettings/AppSettingProvider';
 
 export const Router = () => {
     return (
         <PageTemplate>
             <DeckProvider>
                 <CardProvider>
-                    <Routes>
-                        <Route path="/decks" element={
-                            <>
-
-                                <Decks />
-                            </>
-                        } />
-                        <Route path="/update/" element={
-                            <>
-                                <Update />
-                            </>
-                        }
-                        />
-                        <Route path="/search/" element={
-                            <>
-
-                                <Search />
-                            </>
-                        }
-                        />
-                        <Route path="/decks/study/" element={
-                            <>
-
-                                <Study />
-                            </>
-                        } />
-                    </Routes>
+                    <AppSettingsProvider>
+                        <Routes>
+                            <Route path="/decks" element={<Decks />} />
+                            <Route path="/decks/study/" element={<><Study /></>} />
+                            <Route path="/cardForm/" element={<CardForm />} />
+                            <Route path="/search/" element={<Search />} />
+                        </Routes>
+                    </AppSettingsProvider>
                 </CardProvider>
             </DeckProvider >
         </PageTemplate >

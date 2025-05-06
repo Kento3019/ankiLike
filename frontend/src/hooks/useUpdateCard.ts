@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { Card } from "../types/Card";
-import { useDeck } from "../context/DeckProvider";
-import { useCard } from "../context/CardProvider";
+import { useCard } from "../context/Card/useCard";
+import { useDeck } from "../context/Deck/useDeck";
 
 export const useUpdateCard = () => {
     const { deck } = useDeck();

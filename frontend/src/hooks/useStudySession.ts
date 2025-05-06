@@ -1,31 +1,29 @@
 import { useState, useEffect } from "react";
 import { StudySession } from "../types/StudySession";
 import { Card } from "../types/Card";
-import { useDeck } from "../context/DeckProvider";
-import { useCard } from "../context/CardProvider";
 import { useSpeak } from "./useSpeak";
+import { useNavigate } from "react-router-dom";
+import { useCard } from "../context/Card/useCard";
+import { useDeck } from "../context/Deck/useDeck";
+import { shuffle } from "../utils/Shuffle";
 
 const ASSESSMENTS = ["Again", "Hard", "Good", "Easy"];
 
-const shuffle = <T,>(array: T[]): T[] => {
-    const out = [...array];
-    for (let i = out.length - 1; i > 0; i--) {
-        const r = Math.floor(Math.random() * (i + 1));
-        [out[i], out[r]] = [out[r], out[i]];
-    }
-    return out;
-};
+
 
 export const useStudySession = () => {
     const { deck } = useDeck();
     const { card, setCard } = useCard();
     const { speak } = useSpeak();
+    const navigate = useNavigate();
 
     const [studySession, setStudySession] = useState<StudySession | null>(null);
     const [assessments, setAssessments] = useState<string[]>([]);
     const [twoSideCard, setTwoSideCard] = useState(false);
 
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+    const currentCard = studySession?.cards[studySession.currentIndex];
 
     useEffect(() => {
         const init = async () => {
@@ -59,8 +57,8 @@ export const useStudySession = () => {
             };
 
             setStudySession(session);
-            setCard(undefined); // 現在のカードは一度クリア
-            speak(session.cards[session.currentIndex].front); // 音声再生
+            setCard(undefined);
+            speak(session.cards[session.currentIndex].front);
         } catch (error) {
             console.error("Error fetching cards:", error);
         }
@@ -82,17 +80,27 @@ export const useStudySession = () => {
                 if (!prev) return prev;
 
                 const nextIndex = prev.currentIndex + 1;
-                speak(prev.cards[nextIndex].front); // 音声再生
-
                 if (nextIndex < prev.cards.length) {
+                    speak(prev.cards[nextIndex].front);
                     return { ...prev, currentIndex: nextIndex };
                 }
 
-                return null; // 終了
+                return null;
             });
         } catch (error) {
             console.error("Failed to send quiz result:", error);
         }
+    };
+
+    const handleNext = (result: string) => {
+        if (!currentCard) return;
+        requestQuizResult(currentCard, result);
+    };
+
+    const handleEdit = () => {
+        if (!currentCard) return;
+        setCard(currentCard);
+        navigate(`/cardform`);
     };
 
     return {
@@ -101,5 +109,8 @@ export const useStudySession = () => {
         twoSideCard,
         setTwoSideCard,
         requestQuizResult,
+        currentCard,
+        handleNext,
+        handleEdit,
     };
 };

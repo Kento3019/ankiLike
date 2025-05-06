@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "../types/Card";
-import { useDeck } from "../context/DeckProvider";
+import { useDeck } from "../context/Deck/useDeck";
 
 export const useSearch = () => {
     const { deck } = useDeck();

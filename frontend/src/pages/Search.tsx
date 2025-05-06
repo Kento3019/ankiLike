@@ -1,11 +1,9 @@
 import React from 'react';
 import { useSearch } from '../hooks/useSearch'; // カスタムフックを読み込み
-import { useSpeak } from '../hooks/useSpeak';
-import SpeakerIcon from '../components/UI/icon/SpeakerIcon';
+import { Speaker } from '../components/UI/Speaker';
 
 const Search: React.FC = () => {
     const { cards } = useSearch();
-    const { speak } = useSpeak();
 
     return (
         <div className="max-w-3xl mx-auto ">
@@ -23,15 +21,8 @@ const Search: React.FC = () => {
                                 <tr key={card.cardId} className="hover:bg-green-50 transition">
                                     <td className="px-4 py-2 text-sm text-gray-800">
                                         <div className="flex justify-between items-center p-2 bg-white">
-                                            <div>
-                                                {card.front}
-                                            </div>
-                                            <button
-                                                className="pr-2 cursor-pointer"
-                                                onClick={() => speak(card.front)}
-                                            >
-                                                <SpeakerIcon className="" />
-                                            </button>
+                                            <p>{card.front}</p>
+                                            <Speaker text={card.front} />
                                         </div>
                                     </td>
                                     <td className="px-4 py-2 text-sm text-gray-800">{card.back}</td>
