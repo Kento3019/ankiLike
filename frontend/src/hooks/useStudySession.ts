@@ -5,7 +5,7 @@ import { useSpeak } from "./useSpeak";
 import { useNavigate } from "react-router-dom";
 import { useCard } from "../context/Card/useCard";
 import { useDeck } from "../context/Deck/useDeck";
-import { shuffle } from "../utils/Shuffle";
+import { shuffle } from "../utils/shuffle";
 
 const ASSESSMENTS = ["Again", "Hard", "Good", "Easy"];
 

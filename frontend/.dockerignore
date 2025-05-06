@@ -1,0 +1,7 @@
+# Node build artifacts
+dist
+node_modules
+
+# Git
+.git
+.gitignore

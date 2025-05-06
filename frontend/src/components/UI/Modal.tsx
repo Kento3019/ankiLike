@@ -1,4 +1,4 @@
-import React, { memo, ReactNode, CSSProperties } from 'react';
+import { memo, ReactNode, CSSProperties } from 'react';
 
 type ModalProps = {
     isOpen: boolean;

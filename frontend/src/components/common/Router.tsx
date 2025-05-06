@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Study } from '../../pages/Study';
 import { CardForm } from '../../pages/CardForm';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useUpdateCard } from '../hooks/useUpdateCard';
 import Button from '../components/UI/Button';
 import { useNavigate } from 'react-router-dom';

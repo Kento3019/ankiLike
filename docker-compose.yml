@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - db_store:/var/lib/mysql
+      - ./logs:/var/log/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASS}
+      - TZ=${TZ}
+    ports:
+      - ${DB_PORT}:3306
+  backend:
+    container_name: backend_host
+    build:
+      context: ./backend
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+  frontend:
+    container_name: frontend_host
+    build:
+      context: ./frontend
+      target: production
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+
+volumes:
+  db_store:
