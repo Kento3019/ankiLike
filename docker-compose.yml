@@ -28,12 +28,14 @@ services:
       target: production
     ports:
       - 80:80
+      - 443:443
+    volumes:
+      - ./certbot/conf/selfsigned:/etc/nginx/ssl/selfsigned
     environment:
       USER_NAME_1: ${BASE_USER_NAME_1}
       PASSWD_1: ${BASE_PASSWD_1}
     depends_on:
       - backend
-
 
 volumes:
   db_store:

@@ -76,10 +76,31 @@ tar -zxvf ankilike.tar.gz
 
 ```bash
 
-###docker-compose.ymlと同ディレクトリに移動
+### docker-compose.ymlと同ディレクトリに移動
 cd /opt/ankilike_project/ankilike
 
 ### docker起動
 docker-compose up -d
 
+```
+
+## 6. オレオレ証明書の発行
+
+※個人利用であるため盗聴防止のみを目的として、オレオレ証明書で SSL 化する。
+
+```bash
+
+### OpenSSLで証明書を作成
+mkdir -p ./certbot/conf/selfsigned
+openssl req -x509 -nodes -days 365 \
+  -newkey rsa:2048 \
+  -keyout ./certbot/conf/selfsigned/self.key \
+  -out ./certbot/conf/selfsigned/self.crt \
+  -subj "/CN=localhost"
+```
+
+```nginx
+### default.confのSSL部分を以下のように修正
+ssl_certificate /etc/letsencrypt/selfsigned/self.crt;
+ssl_certificate_key /etc/letsencrypt/selfsigned/self.key;
 ```

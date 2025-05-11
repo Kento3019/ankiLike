@@ -1,0 +1,69 @@
+# ### ビルドツール関連 ###
+
+# Gradle関連
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ### 開発環境（IDE）関連 ###
+
+# Spring Tool Suite (STS) 関連
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# IntelliJ IDEA 関連
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# NetBeans 関連（使っていない場合は削除）
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code 関連
+.vscode/
+
+# ### その他の無視設定 ###
+
+# 生成されたファイルや一時ファイル
+*.log
+*.tmp
+*.bak
+
+# ### バックエンド関連 ###
+# バックエンドで生成されるディレクトリ・ファイル
+.backend/.gradle/
+.backend/build/
+.backend/gradle/
+.backend/.idea/
+.backend/out/
+
+# ### フロントエンド関連 ###
+# フロントエンドで生成されるディレクトリ・ファイル
+/frontend/node_modules
+/frontend/dist
+/frontend/out
+/frontend/.idea/
+
+# SSL関連
+certbot/
+
+# .env ファイルを無視する
+.env
