@@ -3,11 +3,14 @@ import { toast } from "react-toastify";
 import { Card } from "../types/Card";
 import { useCard } from "../context/Card/useCard";
 import { useDeck } from "../context/Deck/useDeck";
+import {
+    createCard as apiCreateCard,
+    updateCard as apiUpdateCard
+} from "../api/cardApi";
 
 export const useUpdateCard = () => {
     const { deck } = useDeck();
     const { card } = useCard();
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
     const [formData, setFormData] = useState<Card>({
         cardId: card?.cardId || "",
@@ -25,44 +28,38 @@ export const useUpdateCard = () => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const fetchCardApi = async (endpoint: string, data: Card, successMessage: string) => {
+    const handleCardApi = async (
+        apiFunc: (data: Card) => Promise<void>,
+        successMessage: string
+    ) => {
         try {
-            const response = await fetch(`${apiBaseUrl}/api/card/${endpoint}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-            });
-
-            if (response.ok) {
-                toast.success(successMessage);
-            } else {
-                toast.error("Network error has occurred");
-            }
+            await apiFunc(formData);
+            toast.success(successMessage);
+            resetFormData();  // Reset the form data after success
         } catch (error) {
             console.error("API Error:", error);
-            toast.error("Error has been occured");
+            toast.error("An error has occurred");
         }
+    };
+
+    const resetFormData = () => {
+        setFormData({
+            cardId: "",
+            deckId: deck?.deckId || "",
+            typeCd: "text",
+            front: "",
+            back: "",
+            statusCd: "NEW",
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!formData.cardId) {
-            await fetchCardApi("create", formData, "Card has been Added");
-
-            setFormData((prev) => ({
-                ...prev,
-                cardId: "",
-                typeCd: "text",
-                front: "",
-                back: "",
-                tag: "",
-                statusCd: "NEW",
-                updatedAt: Date().toString(),
-                nextSpan: 0,
-            }));
+            await handleCardApi(apiCreateCard, "Card has been Added");
         } else {
-            await fetchCardApi("update", formData, "Card has been Updated");
+            await handleCardApi(apiUpdateCard, "Card has been Updated");
         }
     };
 

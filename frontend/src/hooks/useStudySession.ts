@@ -6,10 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { useCard } from "../context/Card/useCard";
 import { useDeck } from "../context/Deck/useDeck";
 import { shuffle } from "../utils/shuffle";
+import { fetchQuizList, postQuizResult } from "../api/cardApi";
 
 const ASSESSMENTS = ["Again", "Hard", "Good", "Easy"];
-
-
 
 export const useStudySession = () => {
     const { deck } = useDeck();
@@ -20,8 +19,6 @@ export const useStudySession = () => {
     const [studySession, setStudySession] = useState<StudySession | null>(null);
     const [assessments, setAssessments] = useState<string[]>([]);
     const [twoSideCard, setTwoSideCard] = useState(false);
-
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
     const currentCard = studySession?.cards[studySession.currentIndex];
 
@@ -38,13 +35,7 @@ export const useStudySession = () => {
 
     const startStudySession = async (deckId: string) => {
         try {
-            const query = new URLSearchParams({ deckId });
-            const response = await fetch(`${apiBaseUrl}/api/card/quiz-list?${query}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-            });
-
-            const cards: Card[] = await response.json();
+            const cards = await fetchQuizList(deckId);
             const shuffled = shuffle(cards);
             const currentIndex = shuffled.findIndex(c => c.cardId === card?.cardId);
 
@@ -66,16 +57,9 @@ export const useStudySession = () => {
 
     const requestQuizResult = async (card: Card, result: string) => {
         try {
-            const response = await fetch(`${apiBaseUrl}/api/card/quiz-result`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cardId: card.cardId, result }),
-            });
-
-            if (!response.ok) return;
+            await postQuizResult(card.cardId, result);
 
             setTwoSideCard(false);
-
             setStudySession(prev => {
                 if (!prev) return prev;
 

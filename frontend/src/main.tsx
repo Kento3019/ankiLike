@@ -9,7 +9,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 createRoot(document.getElementById('root')!).render(
   <>
-    {/* <StrictMode> */}
     <ToastContainer
       position="top-center"
       autoClose={3000}
@@ -25,6 +24,5 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Router />
     </BrowserRouter>
-    {/* </StrictMode>, */}
   </>
 )

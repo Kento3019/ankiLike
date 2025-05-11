@@ -1,9 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { Deck } from "../types/Deck";
 import { useCard } from "../context/Card/useCard";
 import { useDeck } from "../context/Deck/useDeck";
-import { useNavigate } from "react-router-dom";
+import {
+    fetchDeckList,
+    createDeck as apiCreateDeck,
+    updateDeck as apiUpdateDeck,
+    deleteDeck as apiDeleteDeck
+} from "../api/deckApi";
 
 const INITIAL_DECK: Deck = {
     deckId: "",
@@ -12,13 +18,6 @@ const INITIAL_DECK: Deck = {
     newCount: 0,
     learningCount: 0,
     reviewCount: 0,
-};
-
-const API_ENDPOINTS = {
-    LIST: "/api/deck/list",
-    CREATE: "/api/deck/create",
-    UPDATE: "/api/deck/update",
-    DELETE: "/api/deck/delete",
 };
 
 export const useDecks = () => {
@@ -31,54 +30,39 @@ export const useDecks = () => {
     const { setDeck } = useDeck();
     const navigate = useNavigate();
 
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
     const loadDecks = useCallback(async () => {
         try {
-            const response = await fetch(`${apiBaseUrl}${API_ENDPOINTS.LIST}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-            });
-
-            if (!response.ok) throw new Error("Failed to load decks");
-
-            const data = await response.json();
-            setDecks(data);
+            const decks = await fetchDeckList();
+            setDecks(decks);
         } catch (error) {
             console.error("Error loading decks:", error);
             toast.error("An error occurred while loading the decks");
         }
-    }, [apiBaseUrl]);
+    }, []);
 
-    const postDeck = async (endpoint: string, successMessage: string) => {
+    const handleDeckApi = async (
+        apiFunc: (deck: Deck) => Promise<void>,
+        successMessage: string
+    ) => {
         if (!selectedDeck.name.trim()) {
             toast.warn("Please enter a deck name.");
             return;
         }
 
         try {
-            const response = await fetch(`${apiBaseUrl}${endpoint}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(selectedDeck),
-            });
-
-            if (response.ok) {
-                toast.success(successMessage);
-                await loadDecks();
-                setSelectedDeck(INITIAL_DECK);
-            } else {
-                toast.error(`Failed to ${successMessage.toLowerCase()}`);
-            }
+            await apiFunc(selectedDeck);
+            toast.success(successMessage);
+            await loadDecks();
+            setSelectedDeck(INITIAL_DECK);
         } catch (error) {
-            console.error("Error during deck operation:", error);
-            toast.error("Network error has occurred");
+            console.error(`Deck ${successMessage} failed:`, error);
+            toast.error(`Failed to ${successMessage.toLowerCase()}`);
         }
     };
 
-    const createDeck = () => postDeck(API_ENDPOINTS.CREATE, "Deck Created");
-    const updateDeck = () => postDeck(API_ENDPOINTS.UPDATE, "Deck Updated");
-    const deleteDeck = () => postDeck(API_ENDPOINTS.DELETE, "Deck Deleted");
+    const createDeck = () => handleDeckApi(apiCreateDeck, "Deck Created");
+    const updateDeck = () => handleDeckApi(apiUpdateDeck, "Deck Updated");
+    const deleteDeck = () => handleDeckApi(apiDeleteDeck, "Deck Deleted");
 
     const handleNavigation = (path: string, deck: Deck, clearCard = false) => {
         setDeck(deck);
@@ -89,8 +73,10 @@ export const useDecks = () => {
     const handleDeckAction = (action: "edit" | "delete", deck: Deck) => {
         setSelectedDeck({ ...deck });
         if (action === "edit") {
-            setCreateEditModalOpen(true)
-        } else setDeleteModalOpen(true);
+            setCreateEditModalOpen(true);
+        } else {
+            setDeleteModalOpen(true);
+        }
     };
 
     const handleCloseModals = () => {
@@ -100,7 +86,7 @@ export const useDecks = () => {
 
     const handleSubmitDeck = () => {
         if (selectedDeck.deckId === "") {
-            createDeck()
+            createDeck();
         } else {
             updateDeck();
             handleCloseModals();
